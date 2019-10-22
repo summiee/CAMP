@@ -21,3 +21,8 @@ Activate Conda environment
 '''
 conda activate voila
 '''
+
+Start notebook
+'''
+voila ToF_calibration.ipynb
+'''
