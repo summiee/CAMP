@@ -1,6 +1,8 @@
-# Time-of-Flight Mass calibration
+# VMI at CAMP
 
-Interactive Jupyter notebook for time-of-flight mass calibration. Notebooks is meant to be rendered with [Voila](https://github.com/voila-dashboards/voila).
+Interactive Jupyter notebooks to be rendered with [Voila](https://github.com/voila-dashboards/voila).
+
+* Time-of-Flight Mass calibration
 
 Clone repository
 > git clone https://github.com/summiee/tof_mass_calibration.git
@@ -14,6 +16,6 @@ Create new Conda environment with dependencies from file
 Activate Conda environment
 > conda activate voila
 
-Start notebook
+Start notebook e.g.
 > voila ToF_calibration.ipynb
 
