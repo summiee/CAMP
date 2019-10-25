@@ -5,7 +5,7 @@ Interactive Jupyter notebooks to be rendered with [Voila](https://github.com/voi
 * Time-of-Flight Mass calibration
 
 Clone repository
-> git clone https://github.com/summiee/tof_mass_calibration.git
+> git clone https://github.com/summiee/VMI_at_CAMP.git
 
 Change directory
 > cd tof_mass_calibration
