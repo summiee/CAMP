@@ -7,6 +7,7 @@ Jupyter notebooks to work with the Python DOOCS API (pydoocs).
 
 If necessary add conda channels
 > conda config --add channels http://doocspkgs.desy.de/pub/doocsconda/
+
 > conda config --add channels http://www.desy.de/~wwwuser/flashconda
 
 Clone repository
