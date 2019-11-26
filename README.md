@@ -3,7 +3,7 @@
 Jupyter notebooks to work with the Python DOOCS API (pydoocs).
 
 * Save ADC traces to disk 
-* Save images traces to diskydoocs)
+* Save images traces to disk
 
 If necessary add conda channels
 > conda config --add channels http://doocspkgs.desy.de/pub/doocsconda/
