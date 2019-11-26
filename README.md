@@ -7,9 +7,7 @@ Jupyter notebooks to work with the Python DOOCS API (pydoocs).
 
 If necessary add conda channels
 > conda config --add channels http://doocspkgs.desy.de/pub/doocsconda/
-(pydoocs)
 > conda config --add channels http://www.desy.de/~wwwuser/flashconda
-(beamtimedaqaccess, lavue, ramanometer)
 
 Clone repository
 > git clone https://github.com/summiee/CAMP.git
