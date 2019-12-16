@@ -125,7 +125,6 @@ def plot_2d_histograms(tof, x_pos, y_pos ,bin_tof = 6000, bin_space = 256, time_
     plt.title('2d histogram: time-of-flight / x_pos')
     plt.xlabel('ToF [{}]'.format(time_tof_unit))
     plt.ylabel('x_pos')
-    plt.show()
     plt.colorbar()
     
     fig = plt.figure(num = 5)
@@ -134,7 +133,6 @@ def plot_2d_histograms(tof, x_pos, y_pos ,bin_tof = 6000, bin_space = 256, time_
     plt.title('2d histogram: time-of-flight / y_pos')
     plt.xlabel('ToF [{}]'.format(time_tof_unit))
     plt.ylabel('y_pos')
-    plt.show()
     plt.colorbar()
     
 def vmi_image(x_pos, y_pos, show_image = True):
@@ -161,7 +159,8 @@ def transform_vmi_to_polar(x_pos, y_pos, fragment, radius = None, show_images = 
     counts = vmi_image(x_pos, y_pos, show_image = False)
     image_cart = counts.transpose()
     
-    image_polar, r_grid, theta_grid = src.pyabel_polar.reproject_image_into_polar(image_cart, origin=(x_center,y_center))
+    #bug: fix coordinates for pyabel!
+    image_polar, r_grid, theta_grid = src.pyabel_polar.reproject_image_into_polar(image_cart, origin=(x_center,256-y_center))
     radial_ave = np.sum(image_polar, axis=1)
     
     if show_images == True: 

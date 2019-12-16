@@ -5,13 +5,13 @@ fragments:
     test_ion:
         tof_start: 5.6E-6 
         tof_end: 6.0E-6
-        center_x: 1
-        center_y: 1
+        center_x: 134
+        center_y: 161
     test_ion2:
-        tof_start: 5.6E-6 
-        tof_end: 6.0E-6
-        center_x: 1
-        center_y: 1
+        tof_start: 4.33E-6 
+        tof_end: 4.50E-6
+        center_x: 134
+        center_y: 160
     I+:
         tof_start: 5.6E-6 
         tof_end: 6.0E-6

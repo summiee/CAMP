@@ -61,9 +61,9 @@ def load_radial_data(file_name, load_from_path, fragment_list):
 
     print('number of runs:',len(delay_stage_pos))
     print('number of unqique delays:',len(uni_delay))
-    print('shape of radial averages with unique dealy:',np.array(uni_list_of_lists).shape)
+#     print('shape of radial averages with unique dealy:',np.array(uni_list_of_lists).shape)
 
-    return fragment_list, uni_delay, np.array(uni_list_of_lists)
+    return fragment_list, uni_delay, uni_list_of_lists
         
 def simple_plots(fragment_list, uni_delay, uni_list_of_lists):
     for k in range(len(fragment_list)):
