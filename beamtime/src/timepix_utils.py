@@ -9,10 +9,12 @@ import scipy
 import yaml
 
 file_system = 'core'
+config_file = 'src/config.yaml'
+pp_delay_file = 'src/run_pp-delay.txt'
 
 def generate_hdf_file_name(run_number):
-    global file_system
-    with open("config.yaml", 'r') as ymlfile:
+    global file_system, config_file
+    with open(config_file, 'r') as ymlfile:
         cfg = yaml.safe_load(ymlfile)
     hdf_file_path = cfg['path'][file_system]
     try:
@@ -153,7 +155,7 @@ def display_tof_and_vmi_of_tof_interval(hdf_file_complete_path, fragment, hist_b
     plot_tof(tof, hist_bins = hist_bins, time_unit = time_unit)
     vmi_image(x_pos,y_pos)
 
-def transform_vmi_to_polar(x_pos, y_pos, fragment, radius, show_polar_image = False):
+def transform_vmi_to_polar(x_pos, y_pos, fragment, radius = None, show_images = True):
     
     x_center , y_center = get_vmi_center_for_fragment(fragment)
     counts = vmi_image(x_pos, y_pos, show_image = False)
@@ -162,44 +164,46 @@ def transform_vmi_to_polar(x_pos, y_pos, fragment, radius, show_polar_image = Fa
     image_polar, r_grid, theta_grid = src.pyabel_polar.reproject_image_into_polar(image_cart, origin=(x_center,y_center))
     radial_ave = np.sum(image_polar, axis=1)
     
-    fig = plt.figure(num = 6)
-    plt.clf()
-    plt.imshow(image_cart)
-    plt.scatter(x_center, y_center, color='r')
-    plt.gcf().gca().add_artist(plt.Circle((x_center, y_center), radius, color='r', fill=False))
-    plt.xlabel('x_posr [px]')
-    plt.ylabel('y_posr [px]')
-    plt.title('VMI image')
+    if show_images == True: 
+        fig = plt.figure(num = 6)
+        plt.clf()
+        plt.imshow(image_cart)
+        plt.scatter(x_center, y_center, color='r')
+        if radius != None:
+            plt.gcf().gca().add_artist(plt.Circle((x_center, y_center), radius, color='r', fill=False))
+        plt.xlabel('x_posr [px]')
+        plt.ylabel('y_posr [px]')
+        plt.title('VMI image')
 
-    if show_polar_image == True:
         fig = plt.figure(num = 7)
         plt.clf()
         plt.imshow(image_polar)
         plt.title('Image - polar coordinates')
 
-    fig = plt.figure(num = 8)
-    plt.clf()
-    plt.plot(radial_ave,'r-')
-    plt.title('Radial average')
-    plt.xlabel('r [px]')
-    plt.ylabel('counts')
-    plt.show() 
+        fig = plt.figure(num = 8)
+        plt.clf()
+        plt.plot(radial_ave,'r-')
+        plt.title('Radial average')
+        plt.xlabel('r [px]')
+        plt.ylabel('counts')
+    
+    return radial_ave
     
 def get_vmi_center_for_fragment(fragment):
-    with open("config.yaml", 'r') as ymlfile:
-        cfg = yaml.safeimageio.imread_load(ymlfile)
+    global file_system, config_file
+    with open(config_file, 'r') as ymlfile:
+        cfg = yaml.safe_load(ymlfile)
     center_x = cfg['fragments'][fragment]['center_x']
     center_y = cfg['fragments'][fragment]['center_y']
     return center_x, center_y
 
 def get_tof_limits_for_fragment(fragment):
-    with open("config.yaml", 'r') as ymlfile:
+    global file_system, config_file
+    with open(config_file, 'r') as ymlfile:
         cfg = yaml.safe_load(ymlfile)
     tof_start = cfg['fragments'][fragment]['tof_start']
     tof_end = cfg['fragments'][fragment]['tof_end']
     return tof_start, tof_end
-
-########
 
 def get_train_numbers_from_files(run_interval):
     number_of_trains = []
@@ -240,6 +244,7 @@ def plot_number_of_trains_vs_run(run_interval):
     plt.plot(runs,trains,'o')
     plt.ylabel('FEL pulses')
     plt.xlabel('Run Number')
+    plt.title('FEL trains in Runs')
     plt.show()
         
 def list_number_of_trains_vs_run(run_interval): 
@@ -255,7 +260,8 @@ def plot_number_of_trains_vs_delay(run_interval):
     fig = plt.figure(figsize = (10,10))
     plt.plot(unique_delay_pos,unique_trains,'o')
     plt.ylabel('FEL pulses')
-    plt.xlabel('Delay Position')
+    plt.xlabel('Delay position')
+    plt.title('FEL trains in delay position')
     plt.show()
         
 def list_number_of_trains_vs_delay(run_interval):
@@ -267,9 +273,10 @@ def list_number_of_trains_vs_delay(run_interval):
         print('Delay Position:', unique_delay_pos[i],'| number of trains:',unique_trains[i])           
 
 def get_delay_stage_pos_from_txt_file(run_interval):
+    global pp_delay_file
     runs = []
     delay_pos = []
-    filepath = '/home/bl1user/Desktop/erk20919/CAMP/beamtime/run_pp-delay.txt'
+    filepath = pp_delay_file
     with open(filepath) as fp:
         for cnt, line in enumerate(fp):
             tt = [x.strip() for x in line.split(',')]
