@@ -1,0 +1,9 @@
+path:
+    beamline: /gpfs/bl1/current/processed/timepix_hdf/
+    core: /asap3/flash/gpfs/bl1/2019/data/11006902/processed/timepix_hdf/
+fragments:
+    ion1:
+        tof_start: 5.6E-6 
+        tof_end: 6.0E-6
+        center_x: 1
+        center_y: 1
