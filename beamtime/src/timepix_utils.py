@@ -192,16 +192,16 @@ def get_vmi_center_for_fragment(fragment):
     global file_system, config_file
     with open(config_file, 'r') as ymlfile:
         cfg = yaml.safe_load(ymlfile)
-    center_x = cfg['fragments'][fragment]['center_x']
-    center_y = cfg['fragments'][fragment]['center_y']
+    center_x = cfg['fragments_266'][fragment]['center_x']
+    center_y = cfg['fragments_266'][fragment]['center_y']
     return center_x, center_y
 
 def get_tof_limits_for_fragment(fragment):
     global file_system, config_file
     with open(config_file, 'r') as ymlfile:
         cfg = yaml.safe_load(ymlfile)
-    tof_start = cfg['fragments'][fragment]['tof_start']
-    tof_end = cfg['fragments'][fragment]['tof_end']
+    tof_start = cfg['fragments_266'][fragment]['tof_start']
+    tof_end = cfg['fragments_266'][fragment]['tof_end']
     return tof_start, tof_end
 
 def get_train_numbers_from_files(run_interval):
