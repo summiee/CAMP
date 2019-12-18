@@ -3,15 +3,15 @@ path:
     core: /asap3/flash/gpfs/bl1/2019/data/11006902/processed/timepix_hdf/
 fragments:
     test_ion:
-        tof_start: 5.6E-6 
-        tof_end: 6.0E-6
+        tof_start: 1.0575E-5 
+        tof_end: 1.0775E-5
         center_x: 134
-        center_y: 161
+        center_y: 186
     test_ion2:
-        tof_start: 4.33E-6 
-        tof_end: 4.50E-6
-        center_x: 134
-        center_y: 160
+        tof_start: 7.65E-6 
+        tof_end: 7.99E-6
+        center_x: 132
+        center_y: 169
     I+:
         tof_start: 7.7E-6 
         tof_end: 8.0E-6
