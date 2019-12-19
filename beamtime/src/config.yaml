@@ -77,7 +77,7 @@ fragments_266:
         tof_start: 1.0E-5 
         tof_end: 1.05E-5
         center_x: 134
-        center_y: 196
+        center_y: 183
     H+:
         tof_start: 1.7E-6 
         tof_end: 1.9E-6
@@ -85,23 +85,23 @@ fragments_266:
         center_y: 135
     C+:
         tof_start: 3.7E-6 
-        tof_end: 3.9E-6
+        tof_end: 3.93E-6
         center_x: 134
-        center_y: 134
+        center_y: 144
     H2O+:
         tof_start: 4.45E-6 
-        tof_end: 4.55E-6
+        tof_end: 4.5E-6
         center_x: 134
         center_y: 132
     I6+:
-        tof_start: 4.73E-6 
-        tof_end: 4.78E-6
-        center_x: 134
-        center_y: 155
+        tof_start: 4.7E-6 
+        tof_end: 4.8E-6
+        center_x: 135
+        center_y: 157
     C2Hn+:
         tof_start: 4.9E-6 
         tof_end: 5.4E-6
-        center_x: 134
+        center_x: 135
         center_y: 159
     I4+:
         tof_start: 5.585E-6 
@@ -114,10 +114,10 @@ fragments_266:
         center_x: 133
         center_y: 166
     I3+:
-        tof_start: 6.29E-6 
-        tof_end: 6.38E-6
+        tof_start: 6.26E-6 
+        tof_end: 6.41E-6
         center_x: 134
-        center_y: 163
+        center_y: 162
     I2+all:
         tof_start: 7.35E-6 
         tof_end: 7.68E-6
@@ -126,5 +126,5 @@ fragments_266:
     I2+highE:
         tof_start: 7.47E-6 
         tof_end: 7.6E-6
-        center_x: 134
-        center_y: 169
+        center_x: 135
+        center_y: 170

@@ -57,7 +57,7 @@ def data_sliced_by_fragment(hdf_file_complete_path, fragment, event_type = 'raw'
 
 def reduce_raw_data(tof, x_pos, y_pos, number_of_events):
     '''Reduce data for visualization'''
-    return tof[:number_of_events], x_pos[:number_of_events],y_pos[:number_of_events]
+    return tof[:number_of_events], x_pos[:number_of_events], y_pos[:number_of_events]
 
 def number_of_trains_from_hdf(hdf_file_complete_path):
     '''Retrun number of recorded FEL trains in HDF file'''
@@ -129,7 +129,7 @@ def plot_2d_histograms(tof, x_pos, y_pos ,bin_tof = 6000, bin_space = 256, time_
     
     fig = plt.figure(num = 5)
     plt.clf()
-    plt.hist2d(tof, y_pos,bins= (bin_tof, np.linspace(0, bin_space, bin_space+1)), cmax=colormax)
+    plt.hist2d(tof, y_pos, bins = (bin_tof, np.linspace(0, bin_space, bin_space+1)), cmax=colormax)
     plt.title('2d histogram: time-of-flight / y_pos')
     plt.xlabel('ToF [{}]'.format(time_tof_unit))
     plt.ylabel('y_pos')
