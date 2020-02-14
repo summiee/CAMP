@@ -1,5 +1,4 @@
 from camp.timepix_utils import *
-import matplotlib.pyplot as plt
 
 run_number = 178  # short run
 timepix_run = TimePixRun(run_number)
@@ -26,6 +25,6 @@ tof, x_pos, y_pos = timepix_run.get_tof_x_y_of_fragment('test_ion')
 vmi_image = VmiImage(x_pos, y_pos)
 vmi_image.show()
 
-x_start, y_start = 0,0
-x_end, y_end = 100,100
+x_start, y_start = 0, 0
+x_end, y_end = 100, 100
 vmi_image.zoom_in((x_start, y_start), (x_end, y_end))
