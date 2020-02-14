@@ -1,0 +1,7 @@
+path:
+    beamline: /gpfs/bl1/current
+    core: /asap3/flash/gpfs/bl1/2019/data/11006902
+    local: /YOUR/LOCAL/PATH
+timepix: /processed/timepix_hdf/
+pp_delay: /processed/pump_probe_delay/pp_delay.yaml
+

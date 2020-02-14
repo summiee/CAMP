@@ -4,12 +4,12 @@ Clone repository
 > git clone https://github.com/summiee/CAMP.git
 
 Create and activate conda environment
-> conda create --name CAMP --file requirements.txt
+> conda env create -f CAMP.yml
 
 > conda activate CAMP
 
-If necessary add conda channels
-> conda config --add channels http://doocspkgs.desy.de/pub/doocsconda/
+Update environment.yml
+> conda env export > CAMP.yml
 
-> conda config --add channels http://www.desy.de/~wwwuser/flashconda
-
+To run your code, you may need to add the top-level `/CAMP ` folder to the Python path with the comand:
+> export PYTHONPATH="$PYTHONPATH:/path/to/CAMP"
