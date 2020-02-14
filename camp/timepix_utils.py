@@ -193,6 +193,17 @@ class VmiImage(cu.Hist2D):
         counts, xbins, ybins = np.histogram2d(self.x, self.y, bins=(self.bins, self.bins))
         return np.rot90(counts)
 
+    def show(self):
+        plt.imshow(self.create_image())
+        plt.show()
+
+    def zoom_in(self, start_point, end_point):
+        x_start, y_start = start_point
+        x_end, y_end = end_point
+        image = self.create_image()
+        plt.imshow(image[x_start:x_end, y_start: y_end])
+        plt.show()
+
     def create_cart_image(self, image, center, angles=None, radii=None):
         fig = plt.figure()
         plt.imshow(image)
@@ -243,11 +254,13 @@ class VmiImage(cu.Hist2D):
             radial_average_2 = np.average(image_polar[radii[0]:radii[1], angles[0]:-1], axis=1)
             radial_average = np.average(np.array([radial_average_1, radial_average_2]),
                                         axis=0, weights=np.array([angles[1], -angles[0]]))
-        return radial_average
+        pixel_from_center = np.arange(radii[0], radii[1])
+        assert len(pixel_from_center) == len(radial_average)
+        return (pixel_from_center, radial_average)
 
     def plot_profileline(self, radial_average):
         fig = plt.figure()
-        plt.plot(radial_average)
+        plt.plot(radial_average[0], radial_average[1])
         plt.xlabel('radius [px]')
         plt.ylabel('profile line [a.u.]')
         plt.title('radial average')
