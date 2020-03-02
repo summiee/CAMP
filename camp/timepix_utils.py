@@ -201,7 +201,7 @@ class VmiImage(cu.Hist2D):
         x_start, y_start = start_point
         x_end, y_end = end_point
         image = self.create_image()
-        plt.imshow(image[x_start:x_end, y_start: y_end])
+        plt.imshow(image[y_start: y_end, x_start:x_end], extent=[x_start, x_end, y_end, y_start])
         plt.show()
 
     def create_cart_image(self, image, center, angles=None, radii=None):
