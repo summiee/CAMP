@@ -16,3 +16,11 @@ def hist_to_xy(array, bins):
     hist = np.histogram(array, bins=bins)
     y, x = [hist[0], 0.5 * (hist[1][1:] + hist[1][:-1])]
     return x, y
+
+def find_nearest(array, values):
+    indices = np.abs(np.subtract.outer(array, values)).argmin(0)
+    return indices
+
+def missing_elements(list):
+    start, end = list[0], list[-1]
+    return sorted(set(range(start, end + 1)).difference(list))

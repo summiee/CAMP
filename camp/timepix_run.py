@@ -2,6 +2,7 @@ import os
 import numpy as np
 import h5py
 import yaml
+from camp.utils import find_nearest, missing_elements
 
 
 class Ion:
@@ -36,9 +37,9 @@ class TimePixRun:
     def __init__(self, run_number: int):
         assert isinstance(run_number, int)
         self.run_number = run_number
-        self.hdf_file = self.generate_hdf_filename()
+        self.hdf_file = self.__generate_hdf_filename()
 
-    def generate_hdf_filename(self):
+    def __generate_hdf_filename(self):
         with open(self.config_data_path_file, 'r') as ymlfile:
             cfg = yaml.safe_load(ymlfile)
         timepix_hdf_path = cfg['path'][self.file_system] + cfg['timepix']
@@ -83,34 +84,54 @@ class TimePixRun:
             tof = trace(h_file[str(self.event_type) + '/tof'][:], label='ToF', unit='s')
             x_pos = trace(h_file[str(self.event_type) + '/x'][:], label='x pos', unit='px')
             y_pos = trace(h_file[str(self.event_type) + '/y'][:], label='y pos', unit='px')
-        self.assert_equal_length([tof, x_pos, y_pos])
+        self.__assert_equal_length([tof, x_pos, y_pos])
         return tof, x_pos, y_pos
 
-    def get_tof_x_y_sliced_by_tof(self, tof_start=0, tof_end=0.1):
+    def get_tof_x_y_sliced_by_tof_interval(self, tof_start=0, tof_end=0.1):
         tof, x_pos, y_pos = self.get_tof_x_y()
-        sliced_x_pos = self.slice_by_tof(x_pos, tof, tof_start, tof_end)
-        sliced_y_pos = self.slice_by_tof(y_pos, tof, tof_start, tof_end)
-        sliced_tof = self.slice_by_tof(tof, tof, tof_start, tof_end)
-        self.assert_equal_length([sliced_tof, sliced_x_pos, sliced_y_pos])
+        sliced_x_pos = self.__slice_by_tof(x_pos, tof, tof_start, tof_end)
+        sliced_y_pos = self.__slice_by_tof(y_pos, tof, tof_start, tof_end)
+        sliced_tof = self.__slice_by_tof(tof, tof, tof_start, tof_end)
+        self.__assert_equal_length([sliced_tof, sliced_x_pos, sliced_y_pos])
         return sliced_tof, sliced_x_pos, sliced_y_pos
 
     def get_tof_x_y_of_fragment(self, fragment_name):
         fragment = Ion(self.fragments_config_file, fragment_name)
-        return self.get_tof_x_y_sliced_by_tof(fragment.tof_start, fragment.tof_end)
+        return self.get_tof_x_y_sliced_by_tof_interval(fragment.tof_start, fragment.tof_end)
 
-    def get_tof_x_y_of_trigger(self, trigger_nr):
+    def get_tof_x_y_of_single_trigger(self, trigger_nr):
         with h5py.File(self.hdf_file, 'r') as h_file:
             nr = h_file[str(self.event_type) + '/nr'][:]
             tof = trace(h_file[str(self.event_type) + '/tof'][nr == trigger_nr], label='ToF', unit='s')
             x_pos = trace(h_file[str(self.event_type) + '/x'][nr == trigger_nr], label='x pos', unit='px')
             y_pos = trace(h_file[str(self.event_type) + '/y'][nr == trigger_nr], label='y pos', unit='px')
-        self.assert_equal_length([tof, x_pos, y_pos])
+        self.__assert_equal_length([tof, x_pos, y_pos])
         return tof, x_pos, y_pos
 
-    def slice_by_tof(self, array, tof, tof_start, tof_end):
+    def __slice_by_tof(self, array, tof, tof_start, tof_end):
         return trace(array.array[np.logical_and(tof.array > tof_start, tof.array < tof_end)],
                      label=array.label, unit=array.unit)
 
-    def assert_equal_length(self, list_of_obj):
+    def __assert_equal_length(self, list_of_obj):
         for i in range(len(list_of_obj) - 1):
             assert list_of_obj[0].length == list_of_obj[i + 1].length
+
+    def get_trainIDs(self):
+        with h5py.File(self.hdf_file, 'r') as h_file:
+            x2_trainIDs = h_file['x2Times/bunchID'][:]
+            x2_timestamps = h_file['x2Times/ns'][:]
+            tpx3_triggerNrs = h_file['tpx3Times/triggerNr'][:]
+            tpx3_timestamps = h_file['tpx3Times/ns'][:]
+        assert len(x2_trainIDs) == len(x2_timestamps), 'unmatching length'
+        assert len(tpx3_triggerNrs) == len(tpx3_timestamps), 'unmatching length'
+        assert len(set(x2_trainIDs)) == len(x2_trainIDs), 'found duplicates'
+        assert len(set(x2_timestamps)) == len(x2_timestamps), 'found duplicates'
+        start_index = find_nearest(x2_timestamps, tpx3_timestamps[0])
+        assert not (missing_elements(x2_trainIDs[start_index:])), 'list of trainIDs is not continuous'
+        trainIDs = [x2_trainIDs[start_index]]
+        skip = 1
+        for i in range(len(tpx3_triggerNrs) - 1):
+            if (tpx3_timestamps[i + 1] - tpx3_timestamps[i]) > 15E7:
+                skip += 1
+            trainIDs.append(x2_trainIDs[start_index + i + skip])
+        return (tpx3_triggerNrs, np.array(trainIDs))
