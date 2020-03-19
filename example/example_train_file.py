@@ -1,8 +1,8 @@
-import camp.pydoocs_utils as cpu
+from camp.pydoocs_utils import TrainFile
 import matplotlib.pyplot as plt
 
 filename = '../data/test.h5'
-train_file = cpu.TrainFile(filename)
+train_file = TrainFile(filename)
 
 with train_file:
     train_file.contains()

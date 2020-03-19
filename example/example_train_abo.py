@@ -1,8 +1,7 @@
-import camp.pydoocs_utils as cpu
-import pydoocs
+from camp.pydoocs_utils import TrainAbo
 
 doocs_addr = 'FLASH.FEL/ADC.SIS.BL1/EXP1.CH00/CH00.TD'  # MHz ADC
-train_abo = cpu.TrainAbo(doocs_addr)
+train_abo = TrainAbo(doocs_addr)
 
 # print keys
 print(train_abo.channel_keys())
