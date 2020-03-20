@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import numpy as np
 import h5py
 import yaml
@@ -30,8 +31,8 @@ class trace:
 
 class TimePixRun:
     file_system = 'core'
-    config_data_path_file = '../config/beamtime.yaml'
-    fragments_config_file = '../config/fragments.yaml'
+    config_data_path_file = Path('../config/beamtime.yaml')
+    fragments_config_file = Path('../config/fragments.yaml')
     event_type = 'raw'
 
     def __init__(self, run_number: int):
