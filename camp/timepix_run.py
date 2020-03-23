@@ -1,4 +1,5 @@
 import os
+import camp
 from pathlib import Path
 import numpy as np
 import h5py
@@ -31,14 +32,17 @@ class trace:
 
 class TimePixRun:
     file_system = 'core'
-    config_data_path_file = Path('../config/beamtime.yaml')
-    fragments_config_file = Path('../config/fragments.yaml')
     event_type = 'raw'
 
     def __init__(self, run_number: int):
         assert isinstance(run_number, int)
         self.run_number = run_number
-        self.hdf_file = self.__generate_hdf_filename()
+        self.__generate_config_file_path()
+        self.__generate_hdf_filename()
+
+    def __generate_config_file_path(self):
+        self.config_data_path_file = Path(os.path.join(os.path.dirname(camp.__file__), '../config/beamtime.yaml'))
+        self.fragments_config_file = Path(os.path.join(os.path.dirname(camp.__file__), '../config/fragments.yaml'))
 
     def __generate_hdf_filename(self):
         with open(self.config_data_path_file, 'r') as ymlfile:
@@ -52,7 +56,7 @@ class TimePixRun:
                             'rawOnly.hdf5')][0]
             hdf_file_complete_path = timepix_hdf_path + hdf_file
             assert os.path.isfile(hdf_file_complete_path), 'File does not exist!'
-            return hdf_file_complete_path
+            self.hdf_file = hdf_file_complete_path
         except IndexError:
             print("Run", self.run_number, "does not exist!")
 
