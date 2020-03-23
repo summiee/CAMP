@@ -131,12 +131,14 @@ class TimePixRun:
         assert len(tpx3_triggerNrs) == len(tpx3_timestamps), 'unmatching length'
         assert len(set(x2_trainIDs)) == len(x2_trainIDs), 'found duplicates'
         assert len(set(x2_timestamps)) == len(x2_timestamps), 'found duplicates'
+        assert len(set(tpx3_triggerNrs)) == len(tpx3_triggerNrs), 'found duplicates'
+        assert len(set(tpx3_timestamps)) == len(tpx3_timestamps), 'found duplicates'
         start_index = find_nearest(x2_timestamps, tpx3_timestamps[0])
         assert not (missing_elements(x2_trainIDs[start_index:])), 'list of trainIDs is not continuous'
         trainIDs = [x2_trainIDs[start_index]]
         skip = 1
         for i in range(len(tpx3_triggerNrs) - 1):
-            if (tpx3_timestamps[i + 1] - tpx3_timestamps[i]) > 15E7:
+            if (tpx3_triggerNrs[i + 1] - tpx3_triggerNrs[i]) == 2:
                 skip += 1
             trainIDs.append(x2_trainIDs[start_index + i + skip])
         return (tpx3_triggerNrs, np.array(trainIDs))
