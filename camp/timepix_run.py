@@ -52,8 +52,7 @@ class TimePixRun:
             file_start = "run_" + str(self.run_number).zfill(4)
             hdf_file = [i for i in os.listdir(timepix_hdf_path) if
                         os.path.isfile(os.path.join(timepix_hdf_path, i)) and i.startswith(
-                            file_start) and not i.endswith(
-                            'rawOnly.hdf5')][0]
+                            file_start) and i.endswith('.hdf5') and i[-6].isdigit() == True][0]
             hdf_file_complete_path = timepix_hdf_path + hdf_file
             assert os.path.isfile(hdf_file_complete_path), 'File does not exist!'
             self.hdf_file = hdf_file_complete_path
