@@ -32,11 +32,11 @@ class trace:
 
 class TimePixRun:
     file_system = 'core'
-    event_type = 'raw'
 
-    def __init__(self, run_number: int):
+    def __init__(self, run_number: int, event_type='raw'):
         assert isinstance(run_number, int)
         self.run_number = run_number
+        self.event_type = event_type
         self.__generate_config_file_path()
         self.__generate_hdf_filename()
 
@@ -141,3 +141,18 @@ class TimePixRun:
                 skip += 1
             trainIDs.append(x2_trainIDs[start_index + i + skip])
         return (tpx3_triggerNrs, np.array(trainIDs))
+
+    def get_clustersizes(self):
+        with h5py.File(self.hdf_file, 'r') as h_file:
+            clustersizes = trace(h_file['centroided/clustersize'][:])
+        return clustersizes
+
+    def get_clustersizes_sliced_by_tof_interval(self, tof_start=0, tof_end=0.1):
+        clustersizes = self.get_clustersizes()
+        tof, _, _ = self.get_tof_x_y()
+        sliced_clustersizes = self.__slice_by_tof(clustersizes, tof, tof_start, tof_end)
+        return sliced_clustersizes
+
+    def get_clustersizes_of_fragment(self, fragment_name):
+        fragment = Ion(self.fragments_config_file, fragment_name)
+        return self.get_clustersizes_sliced_by_tof_interval(fragment.tof_start, fragment.tof_end)
