@@ -135,12 +135,18 @@ class TimePixRun:
         start_index = find_nearest(x2_timestamps, tpx3_timestamps[0])
         assert not (missing_elements(x2_trainIDs[start_index:])), 'list of trainIDs is not continuous'
         trainIDs = [x2_trainIDs[start_index]]
+        trigger_Nrs = [tpx3_triggerNrs[0]]
         skip = 1
         for i in range(len(tpx3_triggerNrs) - 1):
             if (tpx3_triggerNrs[i + 1] - tpx3_triggerNrs[i]) == 2:
                 skip += 1
-            trainIDs.append(x2_trainIDs[start_index + i + skip])
-        return (tpx3_triggerNrs, np.array(trainIDs))
+            try:
+                trainIDs.append(x2_trainIDs[start_index + i + skip])
+                trigger_Nrs.append(tpx3_triggerNrs[i+1])
+            except IndexError:
+                pass
+        assert len(trainIDs) == len(trigger_Nrs), 'matching fails'
+        return (np.array(trigger_Nrs), np.array(trainIDs))
 
     def get_clustersizes(self):
         with h5py.File(self.hdf_file, 'r') as h_file:
