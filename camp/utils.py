@@ -24,5 +24,5 @@ def find_nearest(array, values):
 
 
 def missing_elements(list):
-    start, end = list[0], list[-1]
+    start, end = int(list[0]), int(list[-1])
     return sorted(set(range(start, end + 1)).difference(list))

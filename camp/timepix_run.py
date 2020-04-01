@@ -61,7 +61,7 @@ class TimePixRun:
 
     def get_number_of_trains_from_hdf(self):
         with h5py.File(self.hdf_file, 'r') as h_file:
-            self.number_of_trains = len(h_file['tpx3Times/triggerNr'][:])
+            self.number_of_trains = len(h_file['timing/timepix/triggerNr'][:])
         return self.number_of_trains
 
     def get_number_of_raw_events(self):
@@ -70,6 +70,9 @@ class TimePixRun:
         return self.number_of_raw_events
 
     def get_pp_delay(self):
+        """
+        Obsolte when synchronized with FLASH DAQ
+        """
         with open(self.config_data_path_file, 'r') as ymlfile:
             cfg = yaml.safe_load(ymlfile)
         pp_delay_path = cfg['path'][self.file_system] + cfg['pp_delay']
@@ -105,7 +108,7 @@ class TimePixRun:
 
     def get_tof_x_y_of_single_trigger(self, trigger_nr):
         with h5py.File(self.hdf_file, 'r') as h_file:
-            nr = h_file[str(self.event_type) + '/nr'][:]
+            nr = h_file[str(self.event_type) + '/triggerNumber'][:]
             tof = trace(h_file[str(self.event_type) + '/tof'][nr == trigger_nr], label='ToF', unit='s')
             x_pos = trace(h_file[str(self.event_type) + '/x'][nr == trigger_nr], label='x pos', unit='px')
             y_pos = trace(h_file[str(self.event_type) + '/y'][nr == trigger_nr], label='y pos', unit='px')
@@ -122,10 +125,10 @@ class TimePixRun:
 
     def get_trainIDs(self):
         with h5py.File(self.hdf_file, 'r') as h_file:
-            x2_trainIDs = h_file['x2Times/bunchID'][:]
-            x2_timestamps = h_file['x2Times/ns'][:]
-            tpx3_triggerNrs = h_file['tpx3Times/triggerNr'][:]
-            tpx3_timestamps = h_file['tpx3Times/ns'][:]
+            x2_trainIDs = h_file['timing/facility/trainID'][:]
+            x2_timestamps = h_file['timing/facility/timestamp'][:]
+            tpx3_triggerNrs = h_file['timing/timepix/triggerNr'][:]
+            tpx3_timestamps = h_file['timing/timepix/timestamp'][:]
         assert len(x2_trainIDs) == len(x2_timestamps), 'unmatching length'
         assert len(tpx3_triggerNrs) == len(tpx3_timestamps), 'unmatching length'
         assert len(set(x2_trainIDs)) == len(x2_trainIDs), 'found duplicates'
