@@ -1,11 +1,6 @@
 import numpy as np
 
 
-def return_list_of_uniques(input_list):
-    output = list(set(input_list))
-    return output
-
-
 def create_image_with_cirlce(size=(400, 400), center=(100, 100)):
     xx, yy = np.mgrid[:size[0], :size[1]]
     circle = (xx - center[0]) ** 2 + (yy - center[1]) ** 2

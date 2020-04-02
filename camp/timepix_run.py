@@ -142,10 +142,10 @@ class TimePixRun:
             tpx3_timestamps = h_file['timing/timepix/timestamp'][:]
         assert len(x2_trainIDs) == len(x2_timestamps), 'unmatching length'
         assert len(tpx3_triggerNrs) == len(tpx3_timestamps), 'unmatching length'
-        assert len(set(x2_trainIDs)) == len(x2_trainIDs), 'found duplicates'
-        assert len(set(x2_timestamps)) == len(x2_timestamps), 'found duplicates'
-        assert len(set(tpx3_triggerNrs)) == len(tpx3_triggerNrs), 'found duplicates'
-        assert len(set(tpx3_timestamps)) == len(tpx3_timestamps), 'found duplicates'
+        assert len(np.unique(x2_trainIDs)) == len(x2_trainIDs), 'found duplicates'
+        assert len(np.unique(x2_timestamps)) == len(x2_timestamps), 'found duplicates'
+        assert len(np.unique(tpx3_triggerNrs)) == len(tpx3_triggerNrs), 'found duplicates'
+        assert len(np.unique(tpx3_timestamps)) == len(tpx3_timestamps), 'found duplicates'
         start_index = find_nearest(x2_timestamps, tpx3_timestamps[0])
         assert not (missing_elements(x2_trainIDs[start_index:])), 'list of trainIDs is not continuous'
         trainIDs = [x2_trainIDs[start_index]]
