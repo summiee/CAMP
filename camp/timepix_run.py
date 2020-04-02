@@ -43,6 +43,7 @@ class TimePixRun:
     def __generate_config_file_path(self):
         self.config_data_path_file = Path(os.path.join(os.path.dirname(camp.__file__), '../config/beamtime.yaml'))
         self.fragments_config_file = Path(os.path.join(os.path.dirname(camp.__file__), '../config/fragments.yaml'))
+        self.run_number_config_file = Path(os.path.join(os.path.dirname(camp.__file__), '../config/run_numbers.yaml'))
 
     def __generate_hdf_filename(self):
         with open(self.config_data_path_file, 'r') as ymlfile:
@@ -84,6 +85,16 @@ class TimePixRun:
             return self.pp_delay
         except KeyError:
             print("Run", self.run_number, "does not have pump-probe delay.")
+            return None
+
+    def get_flash_run_number(self):
+        try:
+            with open(self.run_number_config_file, 'r') as ymlfile:
+                cfg = yaml.safe_load(ymlfile)
+            self.flash_run_number = cfg[self.run_number]
+            return self.flash_run_number
+        except KeyError:
+            print("Run", self.run_number, "does not have a corresponding FLASH DAQ run number.")
             return None
 
     def get_tof_x_y(self):
@@ -145,7 +156,7 @@ class TimePixRun:
                 skip += 1
             try:
                 trainIDs.append(x2_trainIDs[start_index + i + skip])
-                trigger_Nrs.append(tpx3_triggerNrs[i+1])
+                trigger_Nrs.append(tpx3_triggerNrs[i + 1])
             except IndexError:
                 pass
         assert len(trainIDs) == len(trigger_Nrs), 'matching fails'
