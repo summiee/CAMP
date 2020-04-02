@@ -18,6 +18,6 @@ def find_nearest(array, values):
     return indices
 
 
-def missing_elements(list):
+def check_for_completeness(list):
     start, end = int(list[0]), int(list[-1])
     return sorted(set(range(start, end + 1)).difference(list))

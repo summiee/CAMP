@@ -1,10 +1,11 @@
 import os
 import camp
 from pathlib import Path
+import glob
 import numpy as np
 import h5py
 import yaml
-from camp.utils import find_nearest, missing_elements
+from camp.utils import find_nearest, check_for_completeness
 
 
 class Ion:
@@ -50,15 +51,11 @@ class TimePixRun:
             cfg = yaml.safe_load(ymlfile)
         timepix_hdf_path = cfg['path'][self.file_system] + cfg['timepix']
         try:
-            file_start = "run_" + str(self.run_number).zfill(4)
-            hdf_file = [i for i in os.listdir(timepix_hdf_path) if
-                        os.path.isfile(os.path.join(timepix_hdf_path, i)) and i.startswith(
-                            file_start) and i.endswith('.hdf5') and i[-6].isdigit() == True][0]
-            hdf_file_complete_path = timepix_hdf_path + hdf_file
-            assert os.path.isfile(hdf_file_complete_path), 'File does not exist!'
-            self.hdf_file = hdf_file_complete_path
+            file_list = glob.glob(f'{timepix_hdf_path}run_{self.run_number:04d}_*.hdf5')
+            assert len(file_list) < 2, f' assignment ambiguous - more than 1 hdf_file for: {self.run_number}'
+            self.hdf_file = Path(file_list[0])
         except IndexError:
-            print("Run", self.run_number, "does not exist!")
+            print("Run", self.run_number, "not found!")
 
     def get_number_of_trains_from_hdf(self):
         with h5py.File(self.hdf_file, 'r') as h_file:
@@ -147,7 +144,7 @@ class TimePixRun:
         assert len(np.unique(tpx3_triggerNrs)) == len(tpx3_triggerNrs), 'found duplicates'
         assert len(np.unique(tpx3_timestamps)) == len(tpx3_timestamps), 'found duplicates'
         start_index = find_nearest(x2_timestamps, tpx3_timestamps[0])
-        assert not (missing_elements(x2_trainIDs[start_index:])), 'list of trainIDs is not continuous'
+        assert not (check_for_completeness(x2_trainIDs[start_index:])), 'list of trainIDs is not continuous'
         trainIDs = [x2_trainIDs[start_index]]
         trigger_Nrs = [tpx3_triggerNrs[0]]
         skip = 1
