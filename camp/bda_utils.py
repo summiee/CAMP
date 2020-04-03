@@ -1,4 +1,6 @@
 import numpy as np
+import h5py
+import glob
 
 
 def section_ID_intervals(total_interval, section_length):
@@ -45,3 +47,22 @@ def average_image_of_run(daq, cam_addr, run_number):
     list_comp = np.array([average_image_and_weight_of_section(daq, cam_addr, section) for section in sections])
     image = np.average(list_comp[:, 0], axis=0, weights=list_comp[:, 1])
     return image
+
+
+def print_existing_datasets(root_dir, run_number, contains=None):
+    daqs = ['fl1user1', 'fl1user2', 'fl1user3', 'fl2user1', 'fl2user2', 'pbd', 'pbd2']
+
+    def visitor_func(name, node):
+        if isinstance(node, h5py.Dataset):
+            if contains == None:
+                print(node.name)
+            elif contains in node.name:
+                print(node.name)
+
+    for daq in daqs:
+        files = glob.glob(f'{root_dir}{daq}/*run{run_number}*')
+        try:
+            with h5py.File(files[0], 'r') as h_file:
+                h_file.visititems(visitor_func)
+        except IndexError:
+            pass
