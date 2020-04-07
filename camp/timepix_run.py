@@ -40,6 +40,7 @@ class TimePixRun:
         self.event_type = event_type
         self.__generate_config_file_path()
         self.__generate_hdf_filename()
+        self.__fetch_attributes()
 
     def __generate_config_file_path(self):
         self.config_data_path_file = Path(os.path.join(os.path.dirname(camp.__file__), '../config/beamtime.yaml'))
@@ -57,15 +58,13 @@ class TimePixRun:
         except IndexError:
             print("Run", self.run_number, "not found!")
 
-    def get_number_of_trains_from_hdf(self):
+    def __fetch_attributes(self):
         with h5py.File(self.hdf_file, 'r') as h_file:
-            self.number_of_trains = len(h_file['timing/timepix/triggerNr'][:])
-        return self.number_of_trains
-
-    def get_number_of_raw_events(self):
-        tof, _, _ = self.get_tof_x_y()
-        self.number_of_raw_events = tof.length
-        return self.number_of_raw_events
+            self.recorded_trigger = h_file['timing/timepix/'].attrs.__getitem__('nr events')
+            self.recorded_trainIDs = h_file['timing/facility/'].attrs.__getitem__('nr events')
+            self.number_of_raw_events = h_file['raw/'].attrs.__getitem__('nr events')
+            self.number_of_centroided_events = h_file['centroided/'].attrs.__getitem__('nr events')
+            self.shift_vs_flash_daq = h_file['timing/facility/'].attrs.__getitem__('shift')
 
     def get_pp_delay(self):
         """
@@ -116,7 +115,7 @@ class TimePixRun:
 
     def get_tof_x_y_of_single_trigger(self, trigger_nr):
         with h5py.File(self.hdf_file, 'r') as h_file:
-            nr = h_file[str(self.event_type) + '/triggerNumber'][:]
+            nr = h_file[str(self.event_type) + '/trigger nr'][:]
             tof = trace(h_file[str(self.event_type) + '/tof'][nr == trigger_nr], label='ToF', unit='s')
             x_pos = trace(h_file[str(self.event_type) + '/x'][nr == trigger_nr], label='x pos', unit='px')
             y_pos = trace(h_file[str(self.event_type) + '/y'][nr == trigger_nr], label='y pos', unit='px')
@@ -133,9 +132,9 @@ class TimePixRun:
 
     def get_trainIDs(self):
         with h5py.File(self.hdf_file, 'r') as h_file:
-            x2_trainIDs = h_file['timing/facility/trainID'][:]
+            x2_trainIDs = h_file['timing/facility/train id'][:]
             x2_timestamps = h_file['timing/facility/timestamp'][:]
-            tpx3_triggerNrs = h_file['timing/timepix/triggerNr'][:]
+            tpx3_triggerNrs = h_file['timing/timepix/trigger nr'][:]
             tpx3_timestamps = h_file['timing/timepix/timestamp'][:]
         assert len(x2_trainIDs) == len(x2_timestamps), 'unmatching length'
         assert len(tpx3_triggerNrs) == len(tpx3_timestamps), 'unmatching length'
