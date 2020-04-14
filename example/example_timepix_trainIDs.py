@@ -4,9 +4,8 @@ from pprint import pprint
 run_number = 863  # run with trainIDs cut off at the end
 
 timepix_run = TimePixRun(run_number)
-pprint(dir(timepix_run))
 
-print('###')
+pprint([x for x in dir(timepix_run) if not x.startswith('_')])
 
 flash_run_number = timepix_run.get_flash_run_number()
 print(f'corresponding FLASH DAQ run number: {flash_run_number}')

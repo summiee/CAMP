@@ -64,7 +64,7 @@ class TimePixRun:
             self.recorded_trainIDs = h_file['timing/facility/'].attrs.__getitem__('nr events')
             self.number_of_raw_events = h_file['raw/'].attrs.__getitem__('nr events')
             self.number_of_centroided_events = h_file['centroided/'].attrs.__getitem__('nr events')
-            self.shift_vs_flash_daq = h_file['timing/facility/'].attrs.__getitem__('shift')
+            self.trainID_shift = h_file['timing/facility/'].attrs.__getitem__('shift')
 
     def get_pp_delay(self):
         """
@@ -130,7 +130,7 @@ class TimePixRun:
         for i in range(len(list_of_obj) - 1):
             assert list_of_obj[0].length == list_of_obj[i + 1].length
 
-    def get_trainIDs(self):
+    def get_trainIDs(self, shifted = True):
         with h5py.File(self.hdf_file, 'r') as h_file:
             x2_trainIDs = h_file['timing/facility/train id'][:]
             x2_timestamps = h_file['timing/facility/timestamp'][:]
@@ -156,7 +156,10 @@ class TimePixRun:
             except IndexError:
                 pass
         assert len(trainIDs) == len(trigger_Nrs), 'matching fails'
-        return (np.array(trigger_Nrs), np.array(trainIDs))
+        trigger_Nrs, trainIDs = np.array(trigger_Nrs), np.array(trainIDs)
+        if shifted == True and ~np.isnan(self.trainID_shift):
+            trainIDs = trainIDs + self.trainID_shift
+        return trigger_Nrs, trainIDs
 
     def get_clustersizes(self):
         with h5py.File(self.hdf_file, 'r') as h_file:
@@ -172,3 +175,9 @@ class TimePixRun:
     def get_clustersizes_of_fragment(self, fragment_name):
         fragment = Ion(self.fragments_config_file, fragment_name)
         return self.get_clustersizes_sliced_by_tof_interval(fragment.tof_start, fragment.tof_end)
+
+    def get_raw_events_for_triggers(self):
+        with h5py.File(self.hdf_file, 'r') as h_file:
+            trigger_nrs = h_file['raw/trigger nr'][:]
+        triggers, events = np.unique(trigger_nrs, return_counts=True)
+        return triggers, events
