@@ -12,3 +12,5 @@ print(f'corresponding FLASH DAQ run number: {flash_run_number}')
 
 triggers, trainIDs = timepix_run.get_trainIDs()
 print(len(triggers), len(trainIDs))
+
+print(timepix_run.corr_coeff)

@@ -65,6 +65,7 @@ class TimePixRun:
             self.number_of_raw_events = h_file['raw/'].attrs.__getitem__('nr events')
             self.number_of_centroided_events = h_file['centroided/'].attrs.__getitem__('nr events')
             self.trainID_shift = h_file['timing/facility/'].attrs.__getitem__('shift')
+            self.corr_coeff = h_file['timing/facility/'].attrs.__getitem__('corr coeff')
 
     def get_pp_delay(self):
         """
