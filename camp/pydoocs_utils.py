@@ -162,5 +162,3 @@ class DoocsHistory:
         assert len(times) == len(values)
 
 
-def get_current_trainID():
-    return None

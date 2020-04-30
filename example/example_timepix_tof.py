@@ -5,7 +5,7 @@ run_number = 178  # short run
 timepix_run = TimePixRun(run_number)
 
 # extract data
-tof, x_pos, y_pos = timepix_run.get_tof_x_y_of_fragment('test_ion')
+x_pos, y_pos, tof, tot, trigger_nr = timepix_run.get_raw_events_of_fragment('test_ion')
 
 # show ToF plots sequentially
 Tof(tof)

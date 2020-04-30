@@ -34,10 +34,9 @@ class trace:
 class TimePixRun:
     file_system = 'core'
 
-    def __init__(self, run_number: int, event_type='raw'):
+    def __init__(self, run_number: int):
         assert isinstance(run_number, int)
         self.run_number = run_number
-        self.event_type = event_type
         self.__generate_config_file_path()
         self.__generate_hdf_filename()
         self.__fetch_attributes()
@@ -94,34 +93,59 @@ class TimePixRun:
             print("Run", self.run_number, "does not have a corresponding FLASH DAQ run number.")
             return None
 
-    def get_tof_x_y(self):
+    def get_raw_events(self):
         with h5py.File(self.hdf_file, 'r') as h_file:
-            tof = trace(h_file[str(self.event_type) + '/tof'][:], label='ToF', unit='s')
-            x_pos = trace(h_file[str(self.event_type) + '/x'][:], label='x pos', unit='px')
-            y_pos = trace(h_file[str(self.event_type) + '/y'][:], label='y pos', unit='px')
-        self.__assert_equal_length([tof, x_pos, y_pos])
-        return tof, x_pos, y_pos
+            x_pos = trace(h_file['raw/x'][:], label='x pos', unit='px')
+            y_pos = trace(h_file['raw/y'][:], label='y pos', unit='px')
+            tof = trace(h_file['raw/tof'][:], label='ToF', unit='s')
+            tot = trace(h_file['raw/tot'][:], label='ToT', unit='s')
+            trigger_nr = trace(h_file['raw/trigger nr'][:], label='trigger', unit='')
+        self.__assert_equal_length([x_pos, y_pos, tof, tot, trigger_nr])
+        return x_pos, y_pos, tof, tot, trigger_nr
 
-    def get_tof_x_y_sliced_by_tof_interval(self, tof_start=0, tof_end=0.1):
-        tof, x_pos, y_pos = self.get_tof_x_y()
+    def get_raw_events_by_tof_interval(self, tof_start=0, tof_end=0.1):
+        x_pos, y_pos, tof, tot, trigger_nr = self.get_raw_events()
         sliced_x_pos = self.__slice_by_tof(x_pos, tof, tof_start, tof_end)
         sliced_y_pos = self.__slice_by_tof(y_pos, tof, tof_start, tof_end)
+        sliced_tot = self.__slice_by_tof(tot, tof, tof_start, tof_end)
+        sliced_trigger_nr = self.__slice_by_tof(trigger_nr, tof, tof_start, tof_end)
         sliced_tof = self.__slice_by_tof(tof, tof, tof_start, tof_end)
-        self.__assert_equal_length([sliced_tof, sliced_x_pos, sliced_y_pos])
-        return sliced_tof, sliced_x_pos, sliced_y_pos
+        self.__assert_equal_length([sliced_x_pos, sliced_y_pos, sliced_tof, sliced_tot, sliced_trigger_nr])
+        return sliced_x_pos, sliced_y_pos, sliced_tof, sliced_tot, sliced_trigger_nr
 
-    def get_tof_x_y_of_fragment(self, fragment_name):
+    def get_raw_events_of_fragment(self, fragment_name):
         fragment = Ion(self.fragments_config_file, fragment_name)
-        return self.get_tof_x_y_sliced_by_tof_interval(fragment.tof_start, fragment.tof_end)
+        return self.get_raw_events_by_tof_interval(fragment.tof_start, fragment.tof_end)
 
-    def get_tof_x_y_of_single_trigger(self, trigger_nr):
+    def get_centroided_events(self):
         with h5py.File(self.hdf_file, 'r') as h_file:
-            nr = h_file[str(self.event_type) + '/trigger nr'][:]
-            tof = trace(h_file[str(self.event_type) + '/tof'][nr == trigger_nr], label='ToF', unit='s')
-            x_pos = trace(h_file[str(self.event_type) + '/x'][nr == trigger_nr], label='x pos', unit='px')
-            y_pos = trace(h_file[str(self.event_type) + '/y'][nr == trigger_nr], label='y pos', unit='px')
-        self.__assert_equal_length([tof, x_pos, y_pos])
-        return tof, x_pos, y_pos
+            x_pos = trace(h_file['centroided/x'][:], label='x pos', unit='px')
+            y_pos = trace(h_file['centroided/y'][:], label='y pos', unit='px')
+            tof = trace(h_file['centroided/tof'][:], label='ToF', unit='s')
+            tot_avg = trace(h_file['centroided/tot avg'][:], label='ToT avg', unit='s')
+            tot_max = trace(h_file['centroided/tot max'][:], label='ToT max', unit='s')
+            clustersize = trace(h_file['centroided/clustersize'][:], label='clustersize', unit='')
+            trigger_nr = trace(h_file['centroided/trigger nr'][:], label='trigger', unit='')
+        self.__assert_equal_length([x_pos, y_pos, tof, tot_avg, tot_max, clustersize, trigger_nr])
+        return x_pos, y_pos, tof, tot_avg, tot_max, clustersize, trigger_nr
+
+    def get_centroided_events_by_tof_interval(self, tof_start=0, tof_end=0.1):
+        x_pos, y_pos, tof, tot_avg, tot_max, clustersize, trigger_nr = self.get_centroided_events()
+        sliced_x_pos = self.__slice_by_tof(x_pos, tof, tof_start, tof_end)
+        sliced_y_pos = self.__slice_by_tof(y_pos, tof, tof_start, tof_end)
+        sliced_tot_avg = self.__slice_by_tof(tot_avg, tof, tof_start, tof_end)
+        sliced_tot_max = self.__slice_by_tof(tot_max, tof, tof_start, tof_end)
+        sliced_clustersize = self.__slice_by_tof(clustersize, tof, tof_start, tof_end)
+        sliced_trigger_nr = self.__slice_by_tof(trigger_nr, tof, tof_start, tof_end)
+        sliced_tof = self.__slice_by_tof(tof, tof, tof_start, tof_end)
+        self.__assert_equal_length(
+            [sliced_x_pos, sliced_y_pos, sliced_tof, sliced_tot_avg, sliced_tot_max, sliced_clustersize,
+             sliced_trigger_nr])
+        return sliced_x_pos, sliced_y_pos, sliced_tof, sliced_tot_avg, sliced_tot_max, sliced_clustersize, sliced_trigger_nr
+
+    def get_centroided_events_of_fragment(self, fragment_name):
+        fragment = Ion(self.fragments_config_file, fragment_name)
+        return self.get_centroided_events_by_tof_interval(fragment.tof_start, fragment.tof_end)
 
     def __slice_by_tof(self, array, tof, tof_start, tof_end):
         return trace(array.array[np.logical_and(tof.array > tof_start, tof.array < tof_end)],
@@ -131,7 +155,7 @@ class TimePixRun:
         for i in range(len(list_of_obj) - 1):
             assert list_of_obj[0].length == list_of_obj[i + 1].length
 
-    def get_trainIDs(self, shifted = True):
+    def get_trainIDs(self, shifted=True):
         with h5py.File(self.hdf_file, 'r') as h_file:
             x2_trainIDs = h_file['timing/facility/train id'][:]
             x2_timestamps = h_file['timing/facility/timestamp'][:]
@@ -161,24 +185,3 @@ class TimePixRun:
         if shifted == True and ~np.isnan(self.trainID_shift):
             trainIDs = trainIDs + self.trainID_shift
         return trigger_Nrs, trainIDs
-
-    def get_clustersizes(self):
-        with h5py.File(self.hdf_file, 'r') as h_file:
-            clustersizes = trace(h_file['centroided/clustersize'][:])
-        return clustersizes
-
-    def get_clustersizes_sliced_by_tof_interval(self, tof_start=0, tof_end=0.1):
-        clustersizes = self.get_clustersizes()
-        tof, _, _ = self.get_tof_x_y()
-        sliced_clustersizes = self.__slice_by_tof(clustersizes, tof, tof_start, tof_end)
-        return sliced_clustersizes
-
-    def get_clustersizes_of_fragment(self, fragment_name):
-        fragment = Ion(self.fragments_config_file, fragment_name)
-        return self.get_clustersizes_sliced_by_tof_interval(fragment.tof_start, fragment.tof_end)
-
-    def get_raw_events_for_triggers(self):
-        with h5py.File(self.hdf_file, 'r') as h_file:
-            trigger_nrs = h_file['raw/trigger nr'][:]
-        triggers, events = np.unique(trigger_nrs, return_counts=True)
-        return triggers, events
