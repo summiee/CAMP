@@ -14,3 +14,5 @@ triggers, trainIDs = timepix_run.get_trainIDs()
 print(len(triggers), len(trainIDs))
 
 print(timepix_run.corr_coeff)
+
+

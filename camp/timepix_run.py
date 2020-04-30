@@ -185,3 +185,8 @@ class TimePixRun:
         if shifted == True and ~np.isnan(self.trainID_shift):
             trainIDs = trainIDs + self.trainID_shift
         return trigger_Nrs, trainIDs
+
+    def get_hdf_dataset(self, hdf_dataset_name):
+        with h5py.File(self.hdf_file, 'r') as h_file:
+            values = h_file[str(hdf_dataset_name)][:]
+        return values
