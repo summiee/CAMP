@@ -1,10 +1,12 @@
 import os
-import camp
+import sys
 from pathlib import Path
 import glob
+from typing import NamedTuple
 import numpy as np
 import h5py
 import yaml
+import camp
 from camp.utils import find_nearest, check_for_completeness
 
 
@@ -17,22 +19,23 @@ class Ion:
         self.tof_end = cfg['fragments'][fragment_name]['tof_end']
         self.center_x = cfg['fragments'][fragment_name]['center_x']
         self.center_y = cfg['fragments'][fragment_name]['center_y']
+        self.start_x = cfg['fragments'][fragment_name]['start_x']
+        self.end_x = cfg['fragments'][fragment_name]['end_x']
+        self.start_y = cfg['fragments'][fragment_name]['start_y']
+        self.end_y = cfg['fragments'][fragment_name]['end_y']
 
 
-class trace:
-
-    def __init__(self, values, label=None, unit=None):
-        self.array = np.array(values)
-        self.length = len(self.array)
-        self.label = label
-        self.unit = unit
-
-    def __str__(self):
-        return str(self.array)
+class Filter(NamedTuple):
+    '''filter for timepix_run.get_event method'''
+    parameter: str
+    start: float
+    end: float
 
 
 class TimePixRun:
     file_system = 'core'
+    raw_datasets = ['x', 'y', 'tof', 'tot', 'trigger nr']
+    centroided_datasets = ['x', 'y', 'tof', 'tot avg', 'tot max', 'clustersize', 'trigger nr']
 
     def __init__(self, run_number: int):
         assert isinstance(run_number, int)
@@ -93,68 +96,6 @@ class TimePixRun:
             print("Run", self.run_number, "does not have a corresponding FLASH DAQ run number.")
             return None
 
-    def get_raw_events(self):
-        with h5py.File(self.hdf_file, 'r') as h_file:
-            x_pos = trace(h_file['raw/x'][:], label='x pos', unit='px')
-            y_pos = trace(h_file['raw/y'][:], label='y pos', unit='px')
-            tof = trace(h_file['raw/tof'][:], label='ToF', unit='s')
-            tot = trace(h_file['raw/tot'][:], label='ToT', unit='s')
-            trigger_nr = trace(h_file['raw/trigger nr'][:], label='trigger', unit='')
-        self.__assert_equal_length([x_pos, y_pos, tof, tot, trigger_nr])
-        return x_pos, y_pos, tof, tot, trigger_nr
-
-    def get_raw_events_by_tof_interval(self, tof_start=0, tof_end=0.1):
-        x_pos, y_pos, tof, tot, trigger_nr = self.get_raw_events()
-        sliced_x_pos = self.__slice_by_tof(x_pos, tof, tof_start, tof_end)
-        sliced_y_pos = self.__slice_by_tof(y_pos, tof, tof_start, tof_end)
-        sliced_tot = self.__slice_by_tof(tot, tof, tof_start, tof_end)
-        sliced_trigger_nr = self.__slice_by_tof(trigger_nr, tof, tof_start, tof_end)
-        sliced_tof = self.__slice_by_tof(tof, tof, tof_start, tof_end)
-        self.__assert_equal_length([sliced_x_pos, sliced_y_pos, sliced_tof, sliced_tot, sliced_trigger_nr])
-        return sliced_x_pos, sliced_y_pos, sliced_tof, sliced_tot, sliced_trigger_nr
-
-    def get_raw_events_of_fragment(self, fragment_name):
-        fragment = Ion(self.fragments_config_file, fragment_name)
-        return self.get_raw_events_by_tof_interval(fragment.tof_start, fragment.tof_end)
-
-    def get_centroided_events(self):
-        with h5py.File(self.hdf_file, 'r') as h_file:
-            x_pos = trace(h_file['centroided/x'][:], label='x pos', unit='px')
-            y_pos = trace(h_file['centroided/y'][:], label='y pos', unit='px')
-            tof = trace(h_file['centroided/tof'][:], label='ToF', unit='s')
-            tot_avg = trace(h_file['centroided/tot avg'][:], label='ToT avg', unit='s')
-            tot_max = trace(h_file['centroided/tot max'][:], label='ToT max', unit='s')
-            clustersize = trace(h_file['centroided/clustersize'][:], label='clustersize', unit='')
-            trigger_nr = trace(h_file['centroided/trigger nr'][:], label='trigger', unit='')
-        self.__assert_equal_length([x_pos, y_pos, tof, tot_avg, tot_max, clustersize, trigger_nr])
-        return x_pos, y_pos, tof, tot_avg, tot_max, clustersize, trigger_nr
-
-    def get_centroided_events_by_tof_interval(self, tof_start=0, tof_end=0.1):
-        x_pos, y_pos, tof, tot_avg, tot_max, clustersize, trigger_nr = self.get_centroided_events()
-        sliced_x_pos = self.__slice_by_tof(x_pos, tof, tof_start, tof_end)
-        sliced_y_pos = self.__slice_by_tof(y_pos, tof, tof_start, tof_end)
-        sliced_tot_avg = self.__slice_by_tof(tot_avg, tof, tof_start, tof_end)
-        sliced_tot_max = self.__slice_by_tof(tot_max, tof, tof_start, tof_end)
-        sliced_clustersize = self.__slice_by_tof(clustersize, tof, tof_start, tof_end)
-        sliced_trigger_nr = self.__slice_by_tof(trigger_nr, tof, tof_start, tof_end)
-        sliced_tof = self.__slice_by_tof(tof, tof, tof_start, tof_end)
-        self.__assert_equal_length(
-            [sliced_x_pos, sliced_y_pos, sliced_tof, sliced_tot_avg, sliced_tot_max, sliced_clustersize,
-             sliced_trigger_nr])
-        return sliced_x_pos, sliced_y_pos, sliced_tof, sliced_tot_avg, sliced_tot_max, sliced_clustersize, sliced_trigger_nr
-
-    def get_centroided_events_of_fragment(self, fragment_name):
-        fragment = Ion(self.fragments_config_file, fragment_name)
-        return self.get_centroided_events_by_tof_interval(fragment.tof_start, fragment.tof_end)
-
-    def __slice_by_tof(self, array, tof, tof_start, tof_end):
-        return trace(array.array[np.logical_and(tof.array > tof_start, tof.array < tof_end)],
-                     label=array.label, unit=array.unit)
-
-    def __assert_equal_length(self, list_of_obj):
-        for i in range(len(list_of_obj) - 1):
-            assert list_of_obj[0].length == list_of_obj[i + 1].length
-
     def get_trainIDs(self, shifted=True):
         with h5py.File(self.hdf_file, 'r') as h_file:
             x2_trainIDs = h_file['timing/facility/train id'][:]
@@ -190,3 +131,60 @@ class TimePixRun:
         with h5py.File(self.hdf_file, 'r') as h_file:
             values = h_file[str(hdf_dataset_name)][:]
         return values
+
+    def get_events(self, event_type, parameters, *filter_parms, fragment=None):
+        assert event_type in ('raw', 'centroided'), 'event type does not exist'
+        if event_type == 'raw':
+            assert all(elem in self.raw_datasets for elem in parameters), \
+                'parameters do not exist in chosen event type'
+        if event_type == 'centroided':
+            assert all(elem in self.centroided_datasets for elem in parameters), \
+                'parameters do not exist in chosen event type'
+        if filter_parms and fragment:
+            raise Exception('chosing filter parameters and fragments is too ambitious')
+
+        timepix_dict = {}
+        logical_map = None
+        with h5py.File(self.hdf_file, 'r') as h_file:
+            for parameter in parameters:
+                timepix_dict[parameter] = h_file[str(str(event_type) + '/' + str(parameter))][:]
+
+            if filter_parms:
+                for filter_parm in filter_parms:
+                    assert isinstance(filter_parm, Filter), \
+                        'filter parameter is not instance of Filter obj'
+                    if event_type == 'raw':
+                        assert filter_parm.parameter in self.raw_datasets, \
+                            'chosen filter parameter does not exist'
+                    if event_type == 'centroided':
+                        assert filter_parm.parameter in self.centroided_datasets, \
+                            'chosen filter parameter does not exist'
+                    assert type(filter_parm.start) in [int, float], \
+                        'start value of filter is not a number'
+                    assert type(filter_parm.end) in [int, float], \
+                        'end value of filter is not a number'
+
+                for filter_parm in filter_parms:
+                    filter_parm_values = h_file[str(event_type) + '/' + str(filter_parm.parameter)][:]
+                    logical_map_section = np.logical_and(filter_parm_values > filter_parm.start,
+                                                         filter_parm_values < filter_parm.end)
+                    if logical_map is None:
+                        logical_map = logical_map_section
+                    else:
+                        logical_map = np.logical_and(logical_map, logical_map_section)
+
+            if fragment is not None:
+                fragment = Ion(self.fragments_config_file, fragment)
+                x = h_file[str(event_type) + '/x'][:]
+                y = h_file[str(event_type) + '/y'][:]
+                tof = h_file[str(event_type) + '/tof'][:]
+                x_logical_map = np.logical_and(x > fragment.start_x, x < fragment.end_x)
+                y_logical_map = np.logical_and(y > fragment.start_y, y < fragment.end_y)
+                tof_logical_map = np.logical_and(tof > fragment.tof_start, tof < fragment.tof_end)
+                logical_map = np.logical_and.reduce((x_logical_map, y_logical_map, tof_logical_map))
+
+        if logical_map is not None:
+            for key in timepix_dict:
+                timepix_dict[key] = timepix_dict[key][logical_map]
+
+        return timepix_dict

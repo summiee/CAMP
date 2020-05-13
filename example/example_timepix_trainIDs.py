@@ -11,8 +11,6 @@ flash_run_number = timepix_run.get_flash_run_number()
 print(f'corresponding FLASH DAQ run number: {flash_run_number}')
 
 triggers, trainIDs = timepix_run.get_trainIDs()
-print(len(triggers), len(trainIDs))
+print(f'Number of triggers: {len(triggers)} | Number of TrainIDs {len(trainIDs)}')
 
-print(timepix_run.corr_coeff)
-
-
+print(f'correlation coefficient: {timepix_run.corr_coeff}')

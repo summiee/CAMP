@@ -5,10 +5,10 @@ from camp.utils import hist_to_xy
 
 class TimeAxis:
 
-    def __init__(self, trace, new_unit):
-        self.length = trace.length
-        self.label = trace.label
-        self.time_transformation(trace.array, new_unit)
+    def __init__(self, tof, new_unit):
+        # self.length = trace.length
+        # self.label = trace.label
+        self.time_transformation(tof, new_unit)
 
     def time_transformation(self, time_axis_in_seconds, new_time_unit):
         units = [None, 'milli', 'micro', 'nano']
@@ -37,10 +37,10 @@ class TofvsPos1D():
 
     def __init__(self, tof, dim, time_unit='micro'):
         time_axis = TimeAxis(tof, time_unit)
-        plt.scatter(time_axis.array, dim.array, s=10)
-        plt.title(tof.label + '  vs  ' + dim.label)
+        plt.scatter(time_axis.array, dim, s=10)
+        plt.title('position vs time-of-flight')
         plt.xlabel('ToF [{}]'.format(time_axis.plot_unit))
-        plt.ylabel('{} [{}]'.format(dim.label, dim.unit))
+        plt.ylabel('position [px]')
         plt.show()
 
 
@@ -49,9 +49,9 @@ class TofvsPos2D():
     def __init__(self, tof, dim, time_unit='micro', bin_tof=6000, bin_space=256):
         time_axis = TimeAxis(tof, time_unit)
         self.bins = (bin_tof, np.linspace(0, bin_space, bin_space + 1))
-        plt.hist2d(time_axis.array, dim.array, bins=self.bins)
-        plt.title(tof.label + '  vs  ' + dim.label)
+        plt.hist2d(time_axis.array, dim, bins=self.bins)
+        plt.title('position vs time-of-flight')
         plt.xlabel('ToF [{}]'.format(time_axis.plot_unit))
-        plt.ylabel('{} [{}]'.format(dim.label, dim.unit))
+        plt.ylabel('position [px]')
         plt.show()
 

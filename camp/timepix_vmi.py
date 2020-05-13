@@ -8,12 +8,12 @@ class VmiImage():
     bin_space = 256  # number of pixel
 
     def __init__(self, x, y):
-        self.x = x.array
-        self.y = y.array
+        self.x = x
+        self.y = y
         self.bins = np.linspace(0, self.bin_space, self.bin_space + 1)
         self.title = 'VMI image'
-        self.xlabel = '{} [{}]'.format(x.label, x.unit)
-        self.ylabel = '{} [{}]'.format(y.label, y.unit)
+        self.xlabel = 'x [px]'
+        self.ylabel = 'y [px]'
         self.image = self.__create_image()
 
     def __create_image(self):

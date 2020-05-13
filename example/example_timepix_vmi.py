@@ -5,10 +5,11 @@ run_number = 178  # short run
 timepix_run = TimePixRun(run_number)
 
 # extract data
-x_pos, y_pos, tof, tot_avg, tot_max, clustersize, trigger_nr = timepix_run.get_centroided_events_of_fragment('test_ion')
+timepix_dict = timepix_run.get_events('centroided', ['x', 'y'], fragment='test_ion')
+x, y = timepix_dict['x'], timepix_dict['y']
 
 # show VMI image
-vmi_image = VmiImage(x_pos, y_pos)
+vmi_image = VmiImage(x, y)
 vmi_image.show()
 
 # zoom in VMI image
@@ -23,5 +24,5 @@ x_center, y_center = 130, 110
 start_angle, end_angle = -45, 45  # degrees
 start_radius, end_radius = 20, 100  # pixel
 
-radial_average = VmiImage(x_pos, y_pos).create_radial_average((x_center, y_center), angles=(start_angle, end_angle),
-                                                              radii=(start_radius, end_radius))
+radial_average = VmiImage(x, y).create_radial_average((x_center, y_center), angles=(start_angle, end_angle),
+                                                      radii=(start_radius, end_radius))
