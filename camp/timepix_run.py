@@ -13,16 +13,18 @@ from camp.utils import find_nearest, check_for_completeness
 class Ion:
 
     def __init__(self, fragments_config_file: str, fragment_name: str):
+        experimental_set, fragment = fragment_name.split(',')
+        print(experimental_set, fragment)
         with open(fragments_config_file, 'r') as ymlfile:
             cfg = yaml.safe_load(ymlfile)
-        self.tof_start = cfg['fragments'][fragment_name]['tof_start']
-        self.tof_end = cfg['fragments'][fragment_name]['tof_end']
-        self.center_x = cfg['fragments'][fragment_name]['center_x']
-        self.center_y = cfg['fragments'][fragment_name]['center_y']
-        self.start_x = cfg['fragments'][fragment_name]['start_x']
-        self.end_x = cfg['fragments'][fragment_name]['end_x']
-        self.start_y = cfg['fragments'][fragment_name]['start_y']
-        self.end_y = cfg['fragments'][fragment_name]['end_y']
+        self.tof_start = cfg[experimental_set][fragment]['tof_start']
+        self.tof_end = cfg[experimental_set][fragment]['tof_end']
+        self.center_x = cfg[experimental_set][fragment]['center_x']
+        self.center_y = cfg[experimental_set][fragment]['center_y']
+        self.start_x = cfg[experimental_set][fragment]['start_x']
+        self.end_x = cfg[experimental_set][fragment]['end_x']
+        self.start_y = cfg[experimental_set][fragment]['start_y']
+        self.end_y = cfg[experimental_set][fragment]['end_y']
 
 
 class Filter(NamedTuple):

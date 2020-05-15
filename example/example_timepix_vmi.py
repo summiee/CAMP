@@ -5,7 +5,7 @@ run_number = 178  # short run
 timepix_run = TimePixRun(run_number)
 
 # extract data
-timepix_dict = timepix_run.get_events('centroided', ['x', 'y'], fragment='test_ion')
+timepix_dict = timepix_run.get_events('centroided', ['x', 'y'], fragment='fragments,test_ion')
 x, y = timepix_dict['x'], timepix_dict['y']
 
 # show VMI image

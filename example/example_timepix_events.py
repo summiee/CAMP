@@ -19,9 +19,11 @@ timepix_dict = timepix_run.get_events(event_type, parameters, filter_1, filter_2
 print(timepix_dict.keys())
 print(len(timepix_dict['x']))
 
-fragment = 'test_ion'
+fragment = 'fragments,test_ion'
 
 timepix_dict = timepix_run.get_events(event_type, parameters, fragment=fragment)
 
 print(timepix_dict.keys())
 print(len(timepix_dict['x']))
+
+

@@ -5,12 +5,7 @@ from camp.utils import hist_to_xy
 
 class TimeAxis:
 
-    def __init__(self, tof, new_unit):
-        # self.length = trace.length
-        # self.label = trace.label
-        self.time_transformation(tof, new_unit)
-
-    def time_transformation(self, time_axis_in_seconds, new_time_unit):
+    def __init__(self, time_axis_in_seconds, new_time_unit):
         units = [None, 'milli', 'micro', 'nano']
         factors = [1, 10 ** 3, 10 ** 6, 10 ** 9]
         plot_units = ['s', 'ms', '\u03BCs', 'ns']
