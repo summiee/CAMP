@@ -168,8 +168,8 @@ class TimePixRun:
 
                 for filter_parm in filter_parms:
                     filter_parm_values = h_file[str(event_type) + '/' + str(filter_parm.parameter)][:]
-                    logical_map_section = np.logical_and(filter_parm_values > filter_parm.start,
-                                                         filter_parm_values < filter_parm.end)
+                    logical_map_section = np.logical_and(filter_parm_values >= filter_parm.start,
+                                                         filter_parm_values <= filter_parm.end)
                     if logical_map is None:
                         logical_map = logical_map_section
                     else:
