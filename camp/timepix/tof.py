@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from camp.utils import hist_to_xy
+from camp.utils.utils import hist_to_xy
 
 
 class TimeAxis:

@@ -1,5 +1,5 @@
 import numpy as np
-from camp.image_transform import reproject_image_into_polar
+from camp.utils.image_transform import reproject_image_into_polar
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 

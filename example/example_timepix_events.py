@@ -1,4 +1,4 @@
-from camp.timepix_run import TimePixRun, Filter
+from camp.timepix.run import TimePixRun, Filter
 
 run_number = 863
 timepix_run = TimePixRun(run_number)

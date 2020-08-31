@@ -1,4 +1,4 @@
-from camp.timepix_run import TimePixRun
+from camp.timepix.run import TimePixRun
 from pprint import pprint
 
 run_number = 863  # run with trainIDs cut off at the end

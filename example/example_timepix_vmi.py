@@ -1,5 +1,5 @@
-from camp.timepix_run import TimePixRun
-from camp.timepix_vmi import VmiImage
+from camp.timepix.run import TimePixRun
+from camp.timepix.vmi import VmiImage
 
 run_number = 178  # short run
 timepix_run = TimePixRun(run_number)

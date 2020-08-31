@@ -1,5 +1,4 @@
 import os
-import sys
 from pathlib import Path
 import glob
 from typing import NamedTuple
@@ -7,7 +6,7 @@ import numpy as np
 import h5py
 import yaml
 import camp
-from camp.utils import find_nearest, check_for_completeness
+from camp.utils.utils import find_nearest, check_for_completeness
 
 
 class Ion:

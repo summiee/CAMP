@@ -15,7 +15,7 @@ def section_ID_intervals(total_interval, section_length):
     return sections
 
 
-def weight_and_adc_average_of_section(daq, adc_addr, section):
+def average_adc_and_weight_of_section(daq, adc_addr, section):
     traces = daq.valuesOfInterval(adc_addr, section)
     checked_traces = np.array([trace for trace in traces if np.sum(trace) != 0 or True])  # check for empty/NaN traces
     average_trace = np.average(checked_traces, axis=0)
@@ -23,11 +23,11 @@ def weight_and_adc_average_of_section(daq, adc_addr, section):
     return average_trace, weight
 
 
-def total_adc_average_of_run(daq, adc_addr, run_number):
+def average_adc_of_run(daq, adc_addr, run_number):
     total_trainID_inteval = daq.pulseIdIntervalOfRun(adc_addr, run_number)
     section_length = 1000
     sections = section_ID_intervals(total_trainID_inteval, section_length)
-    list_comp = np.array([weight_and_adc_average_of_section(daq, adc_addr, section) for section in sections])
+    list_comp = np.array([average_adc_and_weight_of_section(daq, adc_addr, section) for section in sections])
     trace = np.average(list_comp[:, 0], axis=0, weights=list_comp[:, 1])
     return trace
 

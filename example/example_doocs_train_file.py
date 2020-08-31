@@ -1,4 +1,4 @@
-from camp.pydoocs_utils import TrainFile
+from camp.pydoocs_utils.pydoocs_utils import TrainFile
 import matplotlib.pyplot as plt
 
 filename = '../data/test.h5'
